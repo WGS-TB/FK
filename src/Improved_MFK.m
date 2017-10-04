@@ -25,6 +25,18 @@ nD = size(dnf,1); % Number of monomials in DNF
 %                     Checking conditions                 %
 %                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if (size(cnf,1) > 2 && size(dnf,1) > 2)
+    [cnf, dnf, CA] = CommonVar_AllClauses( cnf, dnf );
+    if (~isempty(CA))
+        disp('Heuristic function works!!')
+        return
+%     else
+%         fdsf=1;
+%         cnf = cnf1;
+%         dnf= dnf1;
+    end
+end
+
 CA = Multiple_Check_Conditions(cnf, dnf);
 
 if (~isempty(CA))

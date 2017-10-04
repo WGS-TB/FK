@@ -1,5 +1,5 @@
 % The below code has been written based on the FK-B algorithm presented in "how to apply sat-solving for the equivalence test of mootone normal forms", page 5
-function CA = MFK_B(cnf, dnf, DualGen, redundancychk, split_method)
+function CA = FK_B(cnf, dnf, DualGen, redundancychk, split_method)
 
 CA = [];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -25,7 +25,7 @@ nD = size(dnf,1); % Number of monomials in DNF
 %                     Checking conditions                 %
 %                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-CA = Multiple_Check_Conditions(cnf, dnf);
+CA = Check_Conditions(cnf, dnf);
 
 if (~isempty(CA))
     return
@@ -38,7 +38,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if min(nD, nC) <= 2
-    val = MEasy_case(cnf, dnf);
+    val = Easy_case(cnf, dnf);
     if(~isempty(val))
         CA = val;
         return
@@ -53,7 +53,7 @@ else %line 5
     C_x_0 = phi_x_0(cnf, split_var);
     
     if mu_frequent_in_A(split_var, dnf, cnf)% if split variable is at most mu-frequent in DNF (line 7)
-        CA = MFK_B([C_x_0; C_x_1], D_x_1, DualGen, redundancychk, split_method ); % line 8
+        CA = FK_B([C_x_0; C_x_1], D_x_1, DualGen, redundancychk, split_method ); % line 8
         
         if (~isempty(CA))
             return %line 9
@@ -77,18 +77,18 @@ else %line 5
             if(isempty(D_cx_0) && isempty(C_cx_1))
                 CA = [];
             else
-                CA = MFK_B(C_cx_1, D_cx_0, DualGen, redundancychk, split_method); %line 11
+                CA = FK_B(C_cx_1, D_cx_0, DualGen, redundancychk, split_method); %line 11
             end
             
             if (~isempty(CA))
-                CA(:, split_var) = 1; % adding split_var
+                CA(split_var) = 1; % adding split_var
                 return %line 12
             end
         end %end of for (i in 1: length(C_x_0))
     else if mu_frequent_in_A(split_var, cnf, dnf) % if split variable is at most mu-frequent in CNF(line 13)
-            CA = MFK_B(C_x_1, [D_x_0; D_x_1], DualGen, redundancychk, split_method); %line 14
+            CA = FK_B(C_x_1, [D_x_0; D_x_1], DualGen, redundancychk, split_method); %line 14
             if (~isempty(CA))
-                CA(:, split_var) = 1;
+                CA(split_var) = 1;
                 return %line 15
             end
             
@@ -109,25 +109,25 @@ else %line 5
                 if(isempty(D_mx_1) && isempty(C_mx_0))
                     CA = [];
                 else
-                    CA = MFK_B(C_mx_0, D_mx_1, DualGen, redundancychk, split_method); %line 17
+                    CA = FK_B(C_mx_0, D_mx_1, DualGen, redundancychk, split_method); %line 17
                 end
                 
                 if (~isempty(CA))
-                    CA(:, logical(vars))= 1;
+                    CA(logical(vars))= 1;
                     return
                 end
             end %end of for (i in 1: length(C_x_0))
         else % line 19
             
-            CA = MFK_B([C_x_0; C_x_1], D_x_1, DualGen, redundancychk, split_method);  %line 20
+            CA = FK_B([C_x_0; C_x_1], D_x_1, DualGen, redundancychk, split_method);  %line 20
             
             if(isempty(CA)) % line 21
                 
-                CA = MFK_B(C_x_1, [D_x_0; D_x_1], DualGen, redundancychk, split_method); % line 22
+                CA = FK_B(C_x_1, [D_x_0; D_x_1], DualGen, redundancychk, split_method); % line 22
                 
                 if (~isempty(CA))
                     % browser()
-                    CA(:, split_var) =1; % adding split.var
+                    CA(split_var) =1; % adding split.var
                     return %line 23
                 end
                 
@@ -136,5 +136,3 @@ else %line 5
     end% end else %line 5
     return
 end
-
-

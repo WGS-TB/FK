@@ -21,9 +21,9 @@ if (isempty(cnf) || isempty(dnf))
         temp = zeros(1, size(cnf, 2));
         temp(vars) = 1;
         CA = temp;
-        if (~isempty(CA))
-            disp('multiple 1')
-        end
+%         if (~isempty(CA))
+%             disp('multiple 1')
+%         end
         
     else % CNF is NULL, then CNF is true and we want DNF to be False
         [row, vars] = find(dnf==1);
@@ -36,9 +36,9 @@ if (isempty(cnf) || isempty(dnf))
         temp = zeros(1, size(dnf, 2));
         temp(vars) = -1; % False vars
         CA = temp;
-        if (~isempty(CA))
-            disp('multiple 2')
-        end
+%         if (~isempty(CA))
+%             disp('multiple 2')
+%         end
         
     end
     return;
@@ -59,9 +59,9 @@ end
 if(sum(any(~chk))>0)
     [~, y] = find(chk==0);
     CA = unique(dnf(y, :), 'rows');
-    if (~isempty(CA))
-        disp('multiple 3')
-    end
+%     if (~isempty(CA))
+%         disp('multiple 3')
+%     end
     
     return
 end
@@ -98,9 +98,9 @@ if (~check)
         temp = dnf(r,:);
         temp(:, x) = 0;
         CA = unique(temp, 'rows');
-        if (~isempty(CA))
-            disp('multiple 4')
-        end
+%         if (~isempty(CA))
+%             disp('multiple 4')
+%         end
         
         return
         
@@ -116,10 +116,10 @@ if (~check)
         temp = tt - cnf(r,:);
         temp(:,x) = 1;
         CA = unique(temp, 'rows');
-        if (~isempty(CA))
-            disp('multiple 5')
-        end
-        
+%         if (~isempty(CA))
+%             disp('multiple 5')
+%         end
+%         
     end
     return;
 end
@@ -155,9 +155,9 @@ if (~check)
             end
             if(~ismember(0, chk))
                 CA = S; % we must set *proper subset* of the largest monoials to true
-                if (~isempty(CA))
-                    disp('multiple 6')
-                end
+%                 if (~isempty(CA))
+%                     disp('multiple 6')
+%                 end
                 
                 return
             end
@@ -185,10 +185,10 @@ if (~check)
             end
             if(~ismember(0, chk))
                 CA = (sum(cnf,1)>0) - S; % we must set *proper subset* of the largest monoials to true
-                if (~isempty(CA))
-                    disp('multiple 7')
-                end
-                
+%                 if (~isempty(CA))
+%                     disp('multiple 7')
+%                 end
+%                 
                 return
             end
         end

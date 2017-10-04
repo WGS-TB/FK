@@ -1,4 +1,4 @@
-function CA = Easy_case(cnf,dnf)
+function CA = MEasy_case(cnf,dnf)
 
 CA = [];
 % +++++++++++++++++++++++++++++++++++++++++++++++++
@@ -52,16 +52,15 @@ if(size(dnf,1)<=2)
     if(isempty(res))
         CA = [];
     else
-        res = res(1,:);
         [~,vars]=find(dnf);
         vars = unique(vars);
         % % %         temp = setdiff(vars, res);
         
-        CA = zeros(1, size(dnf,2));
-        
-        temp = setdiff(vars, find(res));
-        CA(temp) = 1;
-        
+        CA = zeros(size(res,1), size(dnf,2));
+        for tt=1:size(res,1)
+            temp = setdiff(vars, find(res(tt,:)));
+            CA(tt,temp) = 1;
+        end
         %                 if (~isempty(CA))
         %                     disp('Easy 2')
         %                 end
@@ -72,14 +71,11 @@ else
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Case II:  When DNF has more than two monomials and CNF is the shorter one
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    temp = CA_CNF2(cnf, dnf);
+    temp =  CA_CNF2(cnf, dnf);
     if(~isempty(temp))
         %%%        CA = zeros(1, size(dnf,2));
         % % %         CA(temp) = 1;
-        if(size(temp,1)>1)
-            temp = temp(1, :);
-        end
-        CA = temp;
+        CA=temp;
     end
     %         if (~isempty(CA))
     %             disp('Easy 3')

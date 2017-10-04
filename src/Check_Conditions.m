@@ -8,7 +8,6 @@
 function CA = Check_Conditions(cnf, dnf)
 
 CA = [];
-
 %++++++++++++++++++++++++++++
 %
 %++++++++++++++++++++++++++++
@@ -22,11 +21,25 @@ if (isempty(cnf) || isempty(dnf))
         temp = zeros(1, size(cnf, 2));
         temp(vars) = 1;
         CA = temp;
+%         if (~isempty(CA))
+%             disp('multiple 1')
+%         end
+        
     else % CNF is NULL, then CNF is true and we want DNF to be False
-        [~, vars] = find(dnf==1);
+        [row, vars] = find(dnf==1);
+        vv = zeros(1, size(dnf, 1));
+        for t=1:size(dnf,1)
+            ind=find(row==t, 1, 'first');
+            vv(t) = vars(ind);
+        end
+        vars = unique(vv);
         temp = zeros(1, size(dnf, 2));
         temp(vars) = -1; % False vars
         CA = temp;
+%         if (~isempty(CA))
+%             disp('multiple 2')
+%         end
+        
     end
     return;
 end
@@ -39,20 +52,17 @@ end
 chk = zeros(size(cnf, 1), size(dnf, 1));
 for i=1:size(cnf, 1)
     for j=1:size(dnf,1)
-        chk(i,j) = sum(and(cnf(i,:), dnf(j,:)))>0;
+        if sum(and(cnf(i,:), dnf(j,:)))==0
+            CA = dnf(j,:);
+            return
+        end
     end
 end
-
-if(sum(chk==0)>0)
-    [~, y] = find(chk==0);
-    CA = dnf(y(1), :);
-    return
-end
-
 
 %++++++++++++++++++++++++++++
 %       Second Condition
 %++++++++++++++++++++++++++++
+%
 
 [~, temp] = find(cnf);
 cnf_vars = unique(temp);
@@ -60,7 +70,7 @@ cnf_vars = unique(temp);
 [~, temp] = find(dnf);
 dnf_vars = unique(temp);
 
-check = isequal(cnf_vars, dnf_vars);
+check = isequal(cnf_vars, dnf_vars) || isequal(cnf_vars, dnf_vars');
 
 if (~check)
     x = setdiff(dnf_vars, cnf_vars);
@@ -76,9 +86,15 @@ if (~check)
         
         [r,~] = find(dnf(:,x));
         
-        %         CA = setdiff(find(dnf(r(1),:)), x);
-        CA = dnf(r(1),:);
-        CA(x) = 0;
+        temp = dnf(r(1),:);
+        temp(:, x) = 0;
+%         CA = unique(temp, 'rows');
+        CA = temp;
+
+%         if (~isempty(CA))
+%             disp('multiple 4')
+%         end
+        
         return
         
     else % the extra variables are in cnf
@@ -88,13 +104,18 @@ if (~check)
         cnf_vars = unique(temp);
         
         [r,~] = find(cnf(:,x));
-        %         CA = union(setdiff(cnf_vars, find(cnf(r(1),:))), x);
-        temp = ones(1, numel(cnf_vars)) - cnf(r(1),:);
+        tt = zeros(numel(r), size(cnf, 2));
+        tt(:,cnf_vars) = 1;
+        temp = tt - cnf(r,:);
         temp(:,x) = 1;
-        CA = temp;
-        
+        CA = temp(1,:);
+%         CA = unique(temp, 'rows');
+
+%         if (~isempty(CA))
+%             disp('multiple 5')
+%         end
+%         
     end
-    
     return;
 end
 
@@ -117,7 +138,11 @@ if (~check)
             
             bin = dec2bin(i, sum(longest_dnf));
             S = zeros(1, size(dnf, 2));
-            S(longest_dnf) = str2num(bin);
+            bb = zeros(1, length(bin));
+            for u=1:length(bin)
+                bb(u) = str2double(bin(u));
+            end
+            S(logical(longest_dnf)) = bb;
             
             chk = zeros(1, size(cnf,1));
             for j=1:size(cnf,1)
@@ -125,12 +150,17 @@ if (~check)
             end
             if(~ismember(0, chk))
                 CA = S; % we must set *proper subset* of the largest monoials to true
+%                 if (~isempty(CA))
+%                     disp('multiple 6')
+%                 end
+                
                 return
             end
         end
+        % stop('There is sth wrong in CHeck_Conditions' )
     end
     
-    if (t2==FALSE)
+    if (~t2)
         [~, I] = max(sum(cnf, 2));
         longest_cnf = cnf(I,:);
         
@@ -138,15 +168,22 @@ if (~check)
             
             bin = dec2bin(i, sum(longest_cnf));
             S = zeros(1, size(cnf, 2));
-            S(longest_cnf) = str2num(bin);
+            bb = zeros(1, length(bin));
+            for u=1:length(bin)
+                bb(u) = str2double(bin(u));
+            end
+            S(logical(longest_cnf)) = bb;
             
             chk = zeros(1, size(dnf,1));
             for j=1:size(dnf,1)
                 chk(j) = sum(and(S,dnf(j,:)))>0;
             end
             if(~ismember(0, chk))
-                CA = ones(1, numel(cnf_vars))- S; % we must set *proper subset* of the largest monoials to true
-                % browser()
+                CA = (sum(cnf,1)>0) - S; % we must set *proper subset* of the largest monoials to true
+%                 if (~isempty(CA))
+%                     disp('multiple 7')
+%                 end
+%                 
                 return
             end
         end
@@ -156,8 +193,5 @@ if (~check)
 end
 
 % If we reach here, it means that all of conditions are satisfied.
-if (~isempty(CA))
-    CA = sort(CA);
-end
 return
 end
